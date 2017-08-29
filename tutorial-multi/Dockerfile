@@ -8,7 +8,7 @@ ARG node_name
 ADD $path_to_cordapp/kotlin-source/build/nodes/$node_name/corda.jar /opt/corda/corda.jar
 ADD $path_to_cordapp/kotlin-source/build/nodes/$node_name/corda-webserver.jar /opt/corda/corda-webserver.jar
 ADD $path_to_cordapp/kotlin-source/build/nodes/$node_name/plugins /opt/corda/plugins
-ADD $path_to_cordapp/kotlin-source/build/nodes/$node_name/node.conf /opt/corda/node.conf
+ADD ./node-confs/$node_name/node.conf /opt/corda/node.conf
 
 # Create soft-links from /opt/corda dirs and files to service directories
 RUN ln -s /opt/corda/plugins /etc/service/corda/plugins \
