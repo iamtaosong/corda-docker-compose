@@ -1,0 +1,83 @@
+version: '2'
+services:
+  controller:
+    build:
+      context: .
+      args:
+        path_to_cordapp: ${PATH_TO_CORDAPP} # change value in .env to match your setup!
+        node_name: Controller
+    container_name: Controller
+#    volumes:
+#      - ${PATH_TO_CORDAPP}/kotlin-source/build/nodes/Controller/node.conf:/opt/corda/node.conf
+    ports:
+      - "10002" # p2p
+      - "10003" # rpc
+      - "10004:10004" # webserver
+    networks:
+      corda_net:
+        ipv4_address: 172.16.238.10
+  node_a:
+    build:
+      context: .
+      args:
+        path_to_cordapp: ${PATH_TO_CORDAPP} # change value in .env to match your setup!
+        node_name: NodeA
+    container_name: NodeA
+    command: ["/opt/corda/wait_for_controller.sh", "172.16.238.10:10004", "--", "/sbin/my_init"]
+#    volumes:
+#      - ${PATH_TO_CORDAPP}/kotlin-source/build/nodes/NodeA/node.conf:/opt/corda/node.conf
+    ports:
+      - "10002" # p2p
+      - "10003" # rpc
+      - "10005:10004" # webserver
+    networks:
+      corda_net:
+        ipv4_address: 172.16.238.20
+    depends_on:
+     - controller
+  node_b:
+    build:
+      context: .
+      args:
+        path_to_cordapp: ${PATH_TO_CORDAPP} # change value in .env to match your setup!
+        node_name: NodeB
+    container_name: NodeB
+    command: ["/opt/corda/wait_for_controller.sh", "172.16.238.10:10004", "--", "/sbin/my_init"]
+#    volumes:
+#      - ${PATH_TO_CORDAPP}/kotlin-source/build/nodes/NodeB/node.conf:/opt/corda/node.conf
+    ports:
+      - "10002" # p2p
+      - "10003" # rpc
+      - "10006:10004" # webserver
+    networks:
+      corda_net:
+        ipv4_address: 172.16.238.21
+    depends_on:
+     - controller
+  node_c:
+    build:
+      context: .
+      args:
+        path_to_cordapp: ${PATH_TO_CORDAPP} # change value in .env to match your setup!
+        node_name: NodeC
+    container_name: NodeC
+    command: ["/opt/corda/wait_for_controller.sh", "172.16.238.10:10004", "--", "/sbin/my_init"]
+#    volumes:
+#      - ${PATH_TO_CORDAPP}/kotlin-source/build/nodes/NodeC/node.conf:/opt/corda/node.conf
+    ports:
+      - "10002" # p2p
+      - "10003" # rpc
+      - "10007:10004" # webserver
+    networks:
+      corda_net:
+        ipv4_address: 172.16.238.22
+    depends_on:
+     - controller
+
+networks:
+  corda_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.238.0/24

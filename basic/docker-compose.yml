@@ -1,0 +1,56 @@
+version: '2'
+services:
+  controller:
+    build: github.com/corda/corda-docker
+    container_name: Controller
+    environment: 
+      - CORDA_LEGAL_NAME=Controller
+      - CORDA_COUNTRY=UK
+      - CORDA_CITY=London
+    networks:
+      corda_net:
+        ipv4_address: 172.16.238.100
+  node-a:
+    build: github.com/corda/corda-docker
+    container_name: NodeA
+    environment: 
+      - CORDA_LEGAL_NAME=Node A
+      - CORDA_COUNTRY=UK
+      - CORDA_CITY=London
+    networks:
+      corda_net:
+        ipv4_address: 172.16.238.120
+    depends_on:
+     - controller
+  node-b:
+    build: github.com/corda/corda-docker
+    container_name: NodeB
+    environment: 
+      - CORDA_LEGAL_NAME=Node B
+      - CORDA_COUNTRY=US
+      - CORDA_CITY=New York
+    networks:
+      corda_net:
+        ipv4_address: 172.16.238.121
+    depends_on:
+     - controller
+  node-c:
+    build: github.com/corda/corda-docker
+    container_name: NodeC
+    environment: 
+      - CORDA_LEGAL_NAME=Node C
+      - CORDA_COUNTRY=FR
+      - CORDA_CITY=Paris
+    networks:
+      corda_net:
+        ipv4_address: 172.16.238.122
+    depends_on:
+     - controller
+
+networks:
+  corda_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.238.0/24
