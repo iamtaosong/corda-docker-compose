@@ -4,22 +4,23 @@ The _tutorial-multi_ setup is **experimental**, i.e., doesn't work (yet). The se
 
 Clone or download the following github repo to your local host machine: https://github.com/corda/cordapp-tutorial
 
-I cloned it to the root path of the github repo directory, i.e.:
+I cloned it into the _tutorial-multi_, i.e.:
 
 ```
 -|
  |-basic
  |-corda-docker
- |-cordapp-tutorial (this!)
  |-tutorial-multi
- |-tutorial-single
+   |-cordapp-tutorial (this!)
+   |- ...
+ |- ...
 ```
 
-If you clone/download the _cordapp-tutorial_ somewhere else, you need to change the relative path in the _tutorial-multi/.env_ docker environment file. The environment variable is referenced in _tutorial-multi/docker-compose.yml_.
+If you clone/download the _cordapp-tutorial_ somewhere else, you need to change the relative path in the _tutorial-multi/.env_ docker environment file. The environment variable is referenced in _tutorial-multi/docker-compose.yml_. However, docker build requires a location on the same level or below, relative to the build context. So, the default location is probably good and you shouldn't change it. 
 
 Inside _cordapp-tutorial_, run the `./gradlew deployNodes` command on your host (or .bat if you are on windows), as detailed in the cordapp-tutorial readme file, which leads to _build_ folders being created in _cordapp-tutorial/java-sources_ and _cordapp-tutorial/kotlin-sources_. 
 
-Build the base Docker image: `docker build -t corda:m14 corda-docker`
+Build the base Docker image: `docker build -t corda:m14 corda-docker` (from the root directory, corda-docker is the build context)
 
 In the _node.conf_ files of **ALL four nodes (Controller, NodeA, NodeB, and NodeC)**, change the IP:port mappings according to the network in the _tutorial-multi/docker-compose.yml_ network configurations: see _tutorial-multi/node-confs_.
 
