@@ -1,6 +1,8 @@
 # Run the cordapp tutorial on four docker containers (experimental)
 
-The _tutorial-multi_ setup is **experimental**, i.e., doesn't work (yet). The setup is somewhat resource-intensive and unreliable. Maybe someone has an idea how to improve it. I never got it fully running, however, parts of it (such as only Controller + NodeA) seemed to work. Certainly, there is something wrong with my configs and I suspect a race condition or network configuration mistake. Will investigate further if I find time. Drop me a line / open a github issue if you have an idea...
+The _tutorial-multi_ setup is **experimental**, i.e., doesn't work (yet). The setup is somewhat resource-intensive and unreliable. Maybe someone has an idea how to improve it. I never got it fully running, however, parts of it (e.g., only Controller + NodeA) seemed to work.
+
+Drop me a line / open a github issue if you have an idea...
 
 Clone or download the following github repo to your local host machine: https://github.com/corda/cordapp-tutorial
 
@@ -22,21 +24,6 @@ Inside _cordapp-tutorial_, run the `./gradlew deployNodes` command on your host 
 
 Build the base Docker image: `docker build -t corda:m14 corda-docker` (from the root directory, corda-docker is the build context)
 
-In the _node.conf_ files of **ALL four nodes (Controller, NodeA, NodeB, and NodeC)**, change the IP:port mappings according to the network in the _tutorial-multi/docker-compose.yml_ network configurations: see _tutorial-multi/node-confs_.
-
-For example, _kotlin-source/build/nodes/Controller/node.conf_ should be:
-
-```
-extraAdvertisedServiceIds=[
-    "corda.notary.validating"
-]
-myLegalName="CN=Controller,O=R3,OU=corda,L=London,C=UK"
-p2pAddress="172.16.238.10:10002"
-rpcAddress="172.16.238.10:10003"
-rpcUsers=[]
-webAddress="172.16.238.10:10004"
-```
-
 Next, bring up the 4-node network via:
 
 ```
@@ -44,11 +31,11 @@ cd tutorial-multi
 docker-compose up --build
 ```
 
-As written before, this does not work as I expected. The nodes seem to come up fine but then restart the corda java process again and again. I haven't understood why this is happening. Looking at the logs hasn't led me to the root cause of this issue, yet.
+As written before, this does not work as I expected. The nodes seem to come up fine but then restart the corda java process again and again. I haven't understood why this is happening. Looking at the logs hasn't led me to the root cause of this issue, yet. It does work with the Controller with 1 other node (I tried with Controller + NodeA and Controller + NodeB), however, as soon as I launch a third node, the java processes on all three nodes respawn and corda doesn't come up again but keeps stuck in an indefinite respawn loop.
 
 I tried to solve it by adding wait times at certain points:
 
 - The corda-webserver does not start before the corda process. Also, it waits for _/etc/service/corda-webserver/certificates/sslkeystore.jks_ to show up. (in dev, the file is auto-generated when starting corda). See _corda-docker/corda-webserver-X.sh_.
 - The NodeA/B/C nodes wait for the controller. First, there is a docker dependency via `depends_on` in _tutorial-multi/docker-compose.yml_. Second, I added a _wait_for_controller.sh_ script that should delay the node starts until the Controller's corda-webserver is up.
 
-However, this also didn't help to solve the startup issue of the 4 nodes. Maybe, the java processes don't have enough resources, but at this point I am just guessing.
+However, this also didn't help to solve the startup issue of the 4 nodes.
