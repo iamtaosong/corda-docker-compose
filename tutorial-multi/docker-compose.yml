@@ -7,6 +7,8 @@ services:
         path_to_cordapp: ${PATH_TO_CORDAPP} # change value in .env to match your setup!
         node_name: Controller
     container_name: Controller
+    environment:
+      - JAVA_OPTIONS=-Xmx512m
 #    volumes:
 #      - ${PATH_TO_CORDAPP}/kotlin-source/build/nodes/Controller/node.conf:/opt/corda/node.conf
     ports:
@@ -73,6 +75,7 @@ services:
         ipv4_address: 172.16.238.22
     depends_on:
      - controller
+
 
 networks:
   corda_net:
